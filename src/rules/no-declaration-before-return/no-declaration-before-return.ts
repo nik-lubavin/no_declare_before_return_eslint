@@ -1,39 +1,47 @@
 import { Rule } from "eslint";
-import { BlockStatement, CallExpression, Expression, ExpressionStatement, FunctionDeclaration, Identifier, IfStatement, LogicalExpression, ReturnStatement, Statement, SwitchStatement, VariableDeclaration } from "estree";
+import { Node, BlockStatement, Expression, ExpressionStatement, FunctionDeclaration, Identifier, IfStatement, LogicalExpression, ReturnStatement, Statement, SwitchStatement, VariableDeclaration, FunctionExpression } from "estree";
 
-type LintData = { return: boolean, variables: Record<string, any> };
+const DEBUG_LOGGING = 1;
+
+type LintData = { return: boolean, variables: Record<string, Node> };
 type IdentifierCandidates = any[];
 
 const rule: Rule.RuleModule = {
+    meta: {
+        messages: {
+            noDeclarationBeforeReturn: 'Do not declare variables before Return',
+        },
+        fixable: 'code'
+    },
     create: context => ({
-        // FunctionDeclaration: node => {
-        //     const declaredVariables: LintData = { return: false, variables: {} };
-
-
-        //     node.body.body.forEach(node => {
-        //         processNode(node, declaredVariables);
-        //     });
-        // }
         FunctionDeclaration: node => {
             parse_FunctionDeclaration(node, context);
-        }
+        },
+        FunctionExpression: node => {
+            parse_FunctionExpression(node, context);
+        },
     })
 }
 
 function parse_FunctionDeclaration(node: FunctionDeclaration, context: Rule.RuleContext) {
+    if (DEBUG_LOGGING) {
+        console.log('parse_FunctionDeclaration', { node });
+
+    }
     const declaredVariables: LintData = { return: false, variables: {} };
 
     parse_BlockStatement(node.body, declaredVariables, context);
-
-
-    // node.body.body.forEach(node => {
-    //     processNode(node, declaredVariables);
-    // });
-
 }
 
+function parse_FunctionExpression(node: FunctionExpression, context: Rule.RuleContext) {
+    if (DEBUG_LOGGING) {
+        console.log('parse_FunctionExpression', { node });
 
+    }
+    const declaredVariables: LintData = { return: false, variables: {} };
 
+    parse_BlockStatement(node.body, declaredVariables, context);
+}
 
 // ==== STATEMENTS ====
 function parse_BlockStatement(node: BlockStatement, declaredVariables: LintData, context: Rule.RuleContext): void {
@@ -51,14 +59,20 @@ function parse_BlockStatement(node: BlockStatement, declaredVariables: LintData,
             case "IfStatement":
                 parse_IfStatement(element, declaredVariables, context);
 
-                checkReturn(declaredVariables, context)
-                break;
-            case "ReturnStatement":
-                parse_ReturnStatement(element, declaredVariables);
-
-                if (checkReturn(declaredVariables, context)) {
+                if (checkReturn(declaredVariables, context, element)) {
                     parsingGoesOn = false;
                 }
+                break;
+            case "ReturnStatement":
+
+                parse_ReturnStatement(element, declaredVariables);
+
+                console.log({ anc: context.getAncestors() });
+
+
+                // if (checkReturn(declaredVariables, context, element)) {
+                //     parsingGoesOn = false;
+                // }
                 break;
         }
 
@@ -78,19 +92,10 @@ function parse_ReturnStatement(node: ReturnStatement, declaredVariables: LintDat
                 parse_Identifier(node.argument, declaredVariables);
                 break;
             default:
+                // Parsing all expressions in one function
                 parse_Expression(node.argument, declaredVariables);
         }
     }
-
-    // if (node.argument?.type === 'Identifier') {
-    //     parse_Identifier(node.argument, declaredVariables);
-    // } else if (node.argument?.type === 'CallExpression') {
-
-    // } else if (node.argument?.type === 'BinaryExpression') {
-
-    // } else if (node.argument?.type === 'ConditionalExpression') {
-
-    // }
 
     declaredVariables.return = true;
 }
@@ -156,7 +161,7 @@ function parse_LogicalExpression(node: LogicalExpression, result: any[]): any[] 
 function parse_VariableDeclarator(node: VariableDeclaration, declaredVariables: LintData): void {
     const name = (node.declarations[0].id as Identifier).name;
     if (!declaredVariables.variables[name]) {
-        declaredVariables.variables[name] = true;
+        declaredVariables.variables[name] = node;
     }
 }
 
@@ -165,8 +170,8 @@ function parse_VariableDeclarator(node: VariableDeclaration, declaredVariables: 
 function parse_Identifier(node: Identifier, declaredVariables: LintData): void {
     if (declaredVariables.variables[node.name]) {
         delete declaredVariables.variables[node.name];
-        console.log('removed:', node.name,
-            `${node.loc?.start?.column, node.loc?.start?.line} -> ${node.loc?.end?.column, node.loc?.end?.line}`);
+        // console.log('removed:', node.name,
+        //     `${node.loc?.start?.column, node.loc?.start?.line} -> ${node.loc?.end?.column, node.loc?.end?.line}`);
     }
 
 }
@@ -181,9 +186,21 @@ function _identifierFilter(arr: any[] | any[][]): Identifier[] {
 
 // ==== OTHER =====
 
-function checkReturn(declaredVariables: LintData, context: Rule.RuleContext): boolean {
-    if (declaredVariables.return && Object.keys(declaredVariables.variables).length) {
-        console.log('throw an error', { declaredVariables });
+function checkReturn(declaredVariables: LintData, context: Rule.RuleContext, node: Node): boolean {
+    const entries = Object.entries(declaredVariables.variables);
+    if (declaredVariables.return && entries.length) {
+        const entry = entries[0];
+        const error = entry[0];
+        const node = entry[1];
+        if (DEBUG_LOGGING) {
+            console.log(
+                `throw an error: ${node.loc?.start.line} (${node.loc?.start.column}) - ${node.loc?.end.line} (${node.loc?.end.column})`,
+                { declaredVariables, error, range: node.range });
+        }
+
+        context.report({
+            messageId: 'noDeclarationBeforeReturn', node
+        })
 
         return true;
 

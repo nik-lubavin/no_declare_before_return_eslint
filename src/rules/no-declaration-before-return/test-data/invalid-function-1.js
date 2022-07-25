@@ -17,13 +17,11 @@ function invalid() {
     let a13;
 
     a11(a12)
-    a13++
     --a10
 
     a9 = a8
 
-    return;
-
+    // Ternarny
 
 
     if ((2 > a1) || (a2 > a1) || calcB(a3) || a4()) {
