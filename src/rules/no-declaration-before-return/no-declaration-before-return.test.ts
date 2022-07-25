@@ -4,7 +4,8 @@ import rule from './no-declaration-before-return';
 
 const tester = new RuleTester({
     parserOptions: {
-        ecmaVersion: 2015
+        ecmaVersion: 'latest',
+        sourceType: 'module',
     }
 });
 
@@ -18,13 +19,15 @@ const validCode =
 
 const invalidFunction1 = readFileSync(`${__dirname}/test-data/invalid-function-1.js`, 'utf-8');
 const invalidFunction2 = readFileSync(`${__dirname}/test-data/invalid-function-2.js`, 'utf-8');
+const validFunction = readFileSync(`${__dirname}/test-data/valid-function-1.js`, 'utf-8');
 
 tester.run('no-declaration-before-return', rule, {
     valid: [
-        { code: "const a = require('package') " }
+        // { code: "const a = require('package') " },
+        { code: validFunction }
     ],
     invalid: [
         // { code: invalidFunction1, errors: [{ messageId: 'noDeclarationBeforeReturn' }] },
-        { code: invalidFunction2, errors: [{ messageId: 'noDeclarationBeforeReturn' }] },
+        // { code: invalidFunction2, errors: [{ messageId: 'noDeclarationBeforeReturn' }] },
     ]
 });

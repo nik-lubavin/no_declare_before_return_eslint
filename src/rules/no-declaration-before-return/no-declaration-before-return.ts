@@ -1,5 +1,5 @@
 import { Rule } from "eslint";
-import { Node, BlockStatement, Expression, ExpressionStatement, FunctionDeclaration, Identifier, IfStatement, LogicalExpression, ReturnStatement, Statement, SwitchStatement, VariableDeclaration, FunctionExpression } from "estree";
+import { Node, BlockStatement, Expression, ExpressionStatement, FunctionDeclaration, Identifier, IfStatement, LogicalExpression, ReturnStatement, Statement, SwitchStatement, VariableDeclaration, FunctionExpression, ChainExpression, MemberExpression } from "estree";
 
 const DEBUG_LOGGING = 1;
 
@@ -23,21 +23,15 @@ const rule: Rule.RuleModule = {
     })
 }
 
-function parse_FunctionDeclaration(node: FunctionDeclaration, context: Rule.RuleContext) {
-    if (DEBUG_LOGGING) {
-        console.log('parse_FunctionDeclaration', { node });
+// FUNCTIONS
 
-    }
+function parse_FunctionDeclaration(node: FunctionDeclaration, context: Rule.RuleContext) {
     const declaredVariables: LintData = { return: false, variables: {} };
 
     parse_BlockStatement(node.body, declaredVariables, context);
 }
 
 function parse_FunctionExpression(node: FunctionExpression, context: Rule.RuleContext) {
-    if (DEBUG_LOGGING) {
-        console.log('parse_FunctionExpression', { node });
-
-    }
     const declaredVariables: LintData = { return: false, variables: {} };
 
     parse_BlockStatement(node.body, declaredVariables, context);
@@ -67,12 +61,6 @@ function parse_BlockStatement(node: BlockStatement, declaredVariables: LintData,
 
                 parse_ReturnStatement(element, declaredVariables);
 
-                console.log({ anc: context.getAncestors() });
-
-
-                // if (checkReturn(declaredVariables, context, element)) {
-                //     parsingGoesOn = false;
-                // }
                 break;
         }
 
@@ -82,7 +70,7 @@ function parse_BlockStatement(node: BlockStatement, declaredVariables: LintData,
 }
 
 function parse_ExpressionStatement(node: ExpressionStatement, declaredVariables: LintData) {
-    parse_Expression(node.expression, declaredVariables);
+    parse_AnyExpression(node.expression, declaredVariables);
 }
 
 function parse_ReturnStatement(node: ReturnStatement, declaredVariables: LintData) {
@@ -93,7 +81,7 @@ function parse_ReturnStatement(node: ReturnStatement, declaredVariables: LintDat
                 break;
             default:
                 // Parsing all expressions in one function
-                parse_Expression(node.argument, declaredVariables);
+                parse_AnyExpression(node.argument, declaredVariables);
         }
     }
 
@@ -101,21 +89,7 @@ function parse_ReturnStatement(node: ReturnStatement, declaredVariables: LintDat
 }
 
 function parse_IfStatement(node: IfStatement, declaredVariables: LintData, context: Rule.RuleContext): void {
-    const test = node.test as any;
-    let candidates: IdentifierCandidates[];
-
-    // managing clause section
-    if (test.type === "LogicalExpression") {
-        // at first extract all the non-logical Expressions with identifiers
-        const nonLogicalExpressions: any = [];
-        parse_LogicalExpression(test, nonLogicalExpressions);
-
-        nonLogicalExpressions.forEach((expression: any) => {
-            parse_Expression(expression, declaredVariables);
-        });
-    } else {
-        parse_Expression(test, declaredVariables);
-    }
+    parse_AnyExpression(node.test, declaredVariables);
 
     // parsing body
     if (node.consequent.type === 'BlockStatement') {
@@ -130,22 +104,63 @@ function parse_IfStatement(node: IfStatement, declaredVariables: LintData, conte
 
 // ==== EXPRESSIONS ====
 
-function parse_Expression(node: Expression, declaredVariables: LintData): void {
-    const candidates: IdentifierCandidates = [
-        (node as any).left, (node as any).right, // assignment expression
-        (node as any).callee, (node as any).arguments, // call expression
-        (node as any).argument, // update expression
-    ];
+function parse_AnyExpression(node: Expression, declaredVariables: LintData) {
+    if (node.type === "LogicalExpression") {
+        // at first extract all the non-logical Expressions with identifiers
+        const nonLogicalExpressions: any = [];
+        _finalize_LogicalExpression(node, nonLogicalExpressions);
 
-    const identifiers = _identifierFilter(candidates);
+        nonLogicalExpressions.forEach((expression: any) => {
+            _finalize_NonLogicalExpression(expression, declaredVariables);
+        });
+    } else {
+        _finalize_NonLogicalExpression(node, declaredVariables);
+    }
 
-    parse_ArrayOfIdentifiers(identifiers, declaredVariables);
 }
 
-function parse_LogicalExpression(node: LogicalExpression, result: any[]): any[] {
+function _finalize_NonLogicalExpression(node: Expression, declaredVariables: LintData): void {
+    if (node.type === 'ChainExpression') {
+        if (node.expression.type === 'MemberExpression') {
+            const identifier = _getIdentifier_MemberExpression(node.expression);
+            if (identifier) parse_Identifier(identifier, declaredVariables)
+        } else {
+            console.log('Error 1, Unknow expression type');
+
+        }
+
+    } else if (node.type === 'MemberExpression') {
+        const identifier = _getIdentifier_MemberExpression(node);
+        if (identifier) parse_Identifier(identifier, declaredVariables)
+    } else {
+        // All other expressions
+        const candidates: IdentifierCandidates = [
+            (node as any).left, (node as any).right, // assignment expression
+            (node as any).callee, (node as any).arguments, // call expression
+            (node as any).argument, // update expression
+        ];
+
+        const identifiers = _identifierFilter(candidates);
+
+        parse_ArrayOfIdentifiers(identifiers, declaredVariables);
+    }
+}
+
+function _getIdentifier_MemberExpression(node: MemberExpression): Identifier | null {
+    // getting only the object in type Identifier
+    if (node.object.type === 'MemberExpression') {
+        return _getIdentifier_MemberExpression(node.object);
+    } else if (node.object.type === 'Identifier') {
+        return node.object;
+    } else {
+        return null;
+    }
+}
+
+function _finalize_LogicalExpression(node: LogicalExpression, result: any[]): any[] {
     if (node.left.type === 'LogicalExpression') {
         // going recursive
-        parse_LogicalExpression(node.left, result)
+        _finalize_LogicalExpression(node.left, result)
     } else {
         result.push(node.left)
     }
@@ -162,6 +177,9 @@ function parse_VariableDeclarator(node: VariableDeclaration, declaredVariables: 
     const name = (node.declarations[0].id as Identifier).name;
     if (!declaredVariables.variables[name]) {
         declaredVariables.variables[name] = node;
+        if (DEBUG_LOGGING) {
+            console.log(`Added variable ${name} (${node.loc?.start.line} - ${node.loc?.end.line})`);
+        }
     }
 }
 
@@ -170,8 +188,11 @@ function parse_VariableDeclarator(node: VariableDeclaration, declaredVariables: 
 function parse_Identifier(node: Identifier, declaredVariables: LintData): void {
     if (declaredVariables.variables[node.name]) {
         delete declaredVariables.variables[node.name];
-        // console.log('removed:', node.name,
-        //     `${node.loc?.start?.column, node.loc?.start?.line} -> ${node.loc?.end?.column, node.loc?.end?.line}`);
+        if (DEBUG_LOGGING) {
+            console.log('removed:', node.name,
+                `${node.loc?.start?.column} -> ${node.loc?.end?.column}`);
+        }
+
     }
 
 }
