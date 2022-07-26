@@ -1,7 +1,7 @@
 import { Rule } from "eslint";
 import { Node, BlockStatement, Expression, ExpressionStatement, FunctionDeclaration, Identifier, IfStatement, LogicalExpression, ReturnStatement, Statement, SwitchStatement, VariableDeclaration, FunctionExpression, ChainExpression, MemberExpression, UnaryExpression } from "estree";
 
-const DEBUG_LOGGING = 0;
+const DEBUG_LOGGING = 1;
 
 type LintData = { return: boolean, variables: Record<string, Node> };
 type IdentifierCandidates = any[];
@@ -89,6 +89,7 @@ function parse_ReturnStatement(node: ReturnStatement, declaredVariables: LintDat
 }
 
 function parse_IfStatement(node: IfStatement, declaredVariables: LintData, context: Rule.RuleContext): void {
+    // parsing test section
     parse_AnyExpression(node.test, declaredVariables);
 
     // parsing body
@@ -111,15 +112,15 @@ function parse_AnyExpression(node: Expression, declaredVariables: LintData) {
         _finalize_LogicalExpression(node, nonLogicalExpressions);
 
         nonLogicalExpressions.forEach((expression: any) => {
-            _finalize_NonLogicalExpression(expression, declaredVariables);
+            _parse_NonLogicalExpression(expression, declaredVariables);
         });
     } else {
-        _finalize_NonLogicalExpression(node, declaredVariables);
+        _parse_NonLogicalExpression(node, declaredVariables);
     }
 
 }
 
-function _finalize_NonLogicalExpression(node: Expression, declaredVariables: LintData): void {
+function _parse_NonLogicalExpression(node: Expression, declaredVariables: LintData): void {
     if (node.type === 'UnaryExpression') {
         _finalize_UnaryExpression(node, declaredVariables);
     } else if (node.type === 'ChainExpression') {
@@ -127,9 +128,12 @@ function _finalize_NonLogicalExpression(node: Expression, declaredVariables: Lin
 
     } else if (node.type === 'MemberExpression') {
         _finalize_MemberExpression(node, declaredVariables);
+    } else if (node.type === 'BinaryExpression') {
+        parse_AnyExpression(node.left, declaredVariables);
+        parse_AnyExpression(node.right, declaredVariables);
 
     } else {
-        // All other expressions
+        // Just looking for identifiers everywhere
         const candidates: IdentifierCandidates = [
             (node as any).left, (node as any).right, // assignment expression
             (node as any).callee, (node as any).arguments, // call expression
@@ -143,7 +147,12 @@ function _finalize_NonLogicalExpression(node: Expression, declaredVariables: Lin
 }
 
 function _finalize_UnaryExpression(node: UnaryExpression, declaredVariables: LintData) {
-    parse_AnyExpression(node.argument, declaredVariables);
+    if (node.argument.type === 'Identifier') {
+        parse_Identifier(node.argument, declaredVariables);
+    } else {
+        parse_AnyExpression(node.argument, declaredVariables);
+    }
+
 }
 
 function _finalize_ChainExpression(node: ChainExpression, declaredVariables: LintData) {

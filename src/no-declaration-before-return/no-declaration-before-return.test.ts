@@ -21,18 +21,23 @@ const validDir = `${__dirname}/test-data/valid/`;
 const validFunction = readFileSync(`${validDir}valid-function-1.js`, 'utf-8');
 const objectPattern = readFileSync(`${validDir}object-pattern.js`, 'utf-8');
 const unaryExpression = readFileSync(`${validDir}unary-expression.js`, 'utf-8');
+const unaryExpression2 = readFileSync(`${validDir}unary-expression-2.js`, 'utf-8');
+
+const binaryExpression = readFileSync(`${validDir}binary-expression.js`, 'utf-8');
 
 const invalidFunction1 = readFileSync(`${__dirname}/test-data/invalid-function-1.js`, 'utf-8');
 const invalidFunction2 = readFileSync(`${__dirname}/test-data/invalid-function-2.js`, 'utf-8');
 
 tester.run('no-declaration-before-return', rule, {
     valid: [
-        { code: validFunction },
-        { code: objectPattern },
-        { code: unaryExpression },
+        // { code: validFunction },
+        // { code: objectPattern },
+        // { code: unaryExpression },
+        // { code: unaryExpression2 },
+        { code: binaryExpression },
     ],
     invalid: [
-        { code: invalidFunction1, errors: [{ messageId: 'noDeclarationBeforeReturn' }] },
-        { code: invalidFunction2, errors: [{ messageId: 'noDeclarationBeforeReturn' }] },
+        // { code: invalidFunction1, errors: [{ messageId: 'noDeclarationBeforeReturn' }] },
+        // { code: invalidFunction2, errors: [{ messageId: 'noDeclarationBeforeReturn' }] },
     ]
 });
