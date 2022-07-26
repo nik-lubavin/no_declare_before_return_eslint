@@ -1,10 +1,11 @@
 import { Rule } from "eslint";
 import { Node, BlockStatement, Expression, ExpressionStatement, FunctionDeclaration, Identifier, IfStatement, LogicalExpression, ReturnStatement, Statement, SwitchStatement, VariableDeclaration, FunctionExpression, ChainExpression, MemberExpression, UnaryExpression } from "estree";
+import { parse_AnyExpression } from "./parser/expressions";
 
 const DEBUG_LOGGING = 1;
 
-type LintData = { return: boolean, variables: Record<string, Node> };
-type IdentifierCandidates = any[];
+export interface LintData { return: boolean, variables: Record<string, Node> };
+
 
 const rule: Rule.RuleModule = {
     meta: {
@@ -103,100 +104,12 @@ function parse_IfStatement(node: IfStatement, declaredVariables: LintData, conte
     }
 }
 
-// ==== EXPRESSIONS ====
 
-function parse_AnyExpression(node: Expression, declaredVariables: LintData) {
-    if (node.type === "LogicalExpression") {
-        // at first extract all the non-logical Expressions with identifiers
-        const nonLogicalExpressions: any = [];
-        _finalize_LogicalExpression(node, nonLogicalExpressions);
 
-        nonLogicalExpressions.forEach((expression: any) => {
-            _parse_NonLogicalExpression(expression, declaredVariables);
-        });
-    } else {
-        _parse_NonLogicalExpression(node, declaredVariables);
-    }
-
-}
-
-function _parse_NonLogicalExpression(node: Expression, declaredVariables: LintData): void {
-    if (node.type === 'UnaryExpression') {
-        _finalize_UnaryExpression(node, declaredVariables);
-    } else if (node.type === 'ChainExpression') {
-        _finalize_ChainExpression(node, declaredVariables);
-
-    } else if (node.type === 'MemberExpression') {
-        _finalize_MemberExpression(node, declaredVariables);
-    } else if (node.type === 'BinaryExpression') {
-        parse_AnyExpression(node.left, declaredVariables);
-        parse_AnyExpression(node.right, declaredVariables);
-
-    } else {
-        // Just looking for identifiers everywhere
-        const candidates: IdentifierCandidates = [
-            (node as any).left, (node as any).right, // assignment expression
-            (node as any).callee, (node as any).arguments, // call expression
-            (node as any).argument, // update expression
-        ];
-
-        const identifiers = _identifierFilter(candidates);
-
-        parse_ArrayOfIdentifiers(identifiers, declaredVariables);
-    }
-}
-
-function _finalize_UnaryExpression(node: UnaryExpression, declaredVariables: LintData) {
-    if (node.argument.type === 'Identifier') {
-        parse_Identifier(node.argument, declaredVariables);
-    } else {
-        parse_AnyExpression(node.argument, declaredVariables);
-    }
-
-}
-
-function _finalize_ChainExpression(node: ChainExpression, declaredVariables: LintData) {
-    if (node.expression.type === 'MemberExpression') {
-        _finalize_MemberExpression(node.expression, declaredVariables);
-    } else {
-        console.error('Error 1, Unknown expression type');
-
-    }
-}
-
-function _finalize_MemberExpression(node: MemberExpression, declaredVariables: LintData): void {
-    const identifier = _getIdentifier_MemberExpression(node);
-    if (identifier) parse_Identifier(identifier, declaredVariables);
-}
-
-function _getIdentifier_MemberExpression(node: MemberExpression): Identifier | null {
-    // getting only the object in type Identifier
-    if (node.object.type === 'MemberExpression') {
-        return _getIdentifier_MemberExpression(node.object);
-    } else if (node.object.type === 'Identifier') {
-        return node.object;
-    } else {
-        return null;
-    }
-}
-
-function _finalize_LogicalExpression(node: LogicalExpression, result: any[]): any[] {
-    if (node.left.type === 'LogicalExpression') {
-        // going recursive
-        _finalize_LogicalExpression(node.left, result)
-    } else {
-        result.push(node.left)
-    }
-
-    // right side can not be a logical expression
-    result.push(node.right);
-
-    return result;
-}
-
-// ===== DECALRATIONS =====
+// ===== DECLARATIONS =====
 
 function parse_VariableDeclarator(node: VariableDeclaration, declaredVariables: LintData): void {
+    // parsing declaration part
     const declId = node.declarations[0].id;
     if (declId.type === 'Identifier') {
         _declareIdentifier(declId, declaredVariables)
@@ -214,6 +127,12 @@ function parse_VariableDeclarator(node: VariableDeclaration, declaredVariables: 
         })
     }
 
+    // parsing init part
+    const initExpression = node.declarations[0].init;
+    if (initExpression) {
+        parse_AnyExpression(initExpression, declaredVariables);
+    }
+
 }
 
 function _declareIdentifier(node: Identifier, declaredVariables: LintData) {
@@ -228,7 +147,7 @@ function _declareIdentifier(node: Identifier, declaredVariables: LintData) {
 
 // ==== IDENTIFIERS =====
 
-function parse_Identifier(node: Identifier, declaredVariables: LintData): void {
+export function parse_Identifier(node: Identifier, declaredVariables: LintData): void {
     if (declaredVariables.variables[node.name]) {
         delete declaredVariables.variables[node.name];
         if (DEBUG_LOGGING) {
@@ -240,11 +159,11 @@ function parse_Identifier(node: Identifier, declaredVariables: LintData): void {
 
 }
 
-function parse_ArrayOfIdentifiers(identifiers: Identifier[], declaredVariables: LintData): void {
+export function parse_ArrayOfIdentifiers(identifiers: Identifier[], declaredVariables: LintData): void {
     identifiers.forEach(identifier => parse_Identifier(identifier, declaredVariables));
 }
 
-function _identifierFilter(arr: any[] | any[][]): Identifier[] {
+export function identifierFilter(arr: any[] | any[][]): Identifier[] {
     return arr.flat().filter(item => !!item).filter(item => item.type === 'Identifier');
 }
 
@@ -271,5 +190,7 @@ function checkReturn(declaredVariables: LintData, context: Rule.RuleContext, nod
 
     return false
 }
+
+
 
 export default rule;
