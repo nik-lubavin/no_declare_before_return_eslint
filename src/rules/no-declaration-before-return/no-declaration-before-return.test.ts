@@ -17,14 +17,19 @@ const validCode =
     }`;
 
 
+const validDir = `${__dirname}/test-data/valid/`;
+const validFunction = readFileSync(`${validDir}valid-function-1.js`, 'utf-8');
+const objectPattern = readFileSync(`${validDir}object-pattern.js`, 'utf-8');
+const unaryExpression = readFileSync(`${validDir}unary-expression.js`, 'utf-8');
+
 const invalidFunction1 = readFileSync(`${__dirname}/test-data/invalid-function-1.js`, 'utf-8');
 const invalidFunction2 = readFileSync(`${__dirname}/test-data/invalid-function-2.js`, 'utf-8');
-const validFunction = readFileSync(`${__dirname}/test-data/valid-function-1.js`, 'utf-8');
 
 tester.run('no-declaration-before-return', rule, {
     valid: [
-        // { code: "const a = require('package') " },
-        { code: validFunction }
+        { code: validFunction },
+        { code: objectPattern },
+        { code: unaryExpression },
     ],
     invalid: [
         // { code: invalidFunction1, errors: [{ messageId: 'noDeclarationBeforeReturn' }] },

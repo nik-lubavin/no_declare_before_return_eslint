@@ -1,7 +1,7 @@
 import { Rule } from "eslint";
-import { Node, BlockStatement, Expression, ExpressionStatement, FunctionDeclaration, Identifier, IfStatement, LogicalExpression, ReturnStatement, Statement, SwitchStatement, VariableDeclaration, FunctionExpression, ChainExpression, MemberExpression } from "estree";
+import { Node, BlockStatement, Expression, ExpressionStatement, FunctionDeclaration, Identifier, IfStatement, LogicalExpression, ReturnStatement, Statement, SwitchStatement, VariableDeclaration, FunctionExpression, ChainExpression, MemberExpression, UnaryExpression } from "estree";
 
-const DEBUG_LOGGING = 1;
+const DEBUG_LOGGING = 0;
 
 type LintData = { return: boolean, variables: Record<string, Node> };
 type IdentifierCandidates = any[];
@@ -120,18 +120,14 @@ function parse_AnyExpression(node: Expression, declaredVariables: LintData) {
 }
 
 function _finalize_NonLogicalExpression(node: Expression, declaredVariables: LintData): void {
-    if (node.type === 'ChainExpression') {
-        if (node.expression.type === 'MemberExpression') {
-            const identifier = _getIdentifier_MemberExpression(node.expression);
-            if (identifier) parse_Identifier(identifier, declaredVariables)
-        } else {
-            console.log('Error 1, Unknow expression type');
-
-        }
+    if (node.type === 'UnaryExpression') {
+        _finalize_UnaryExpression(node, declaredVariables);
+    } else if (node.type === 'ChainExpression') {
+        _finalize_ChainExpression(node, declaredVariables);
 
     } else if (node.type === 'MemberExpression') {
-        const identifier = _getIdentifier_MemberExpression(node);
-        if (identifier) parse_Identifier(identifier, declaredVariables)
+        _finalize_MemberExpression(node, declaredVariables);
+
     } else {
         // All other expressions
         const candidates: IdentifierCandidates = [
@@ -144,6 +140,24 @@ function _finalize_NonLogicalExpression(node: Expression, declaredVariables: Lin
 
         parse_ArrayOfIdentifiers(identifiers, declaredVariables);
     }
+}
+
+function _finalize_UnaryExpression(node: UnaryExpression, declaredVariables: LintData) {
+    parse_AnyExpression(node.argument, declaredVariables);
+}
+
+function _finalize_ChainExpression(node: ChainExpression, declaredVariables: LintData) {
+    if (node.expression.type === 'MemberExpression') {
+        _finalize_MemberExpression(node.expression, declaredVariables);
+    } else {
+        console.error('Error 1, Unknown expression type');
+
+    }
+}
+
+function _finalize_MemberExpression(node: MemberExpression, declaredVariables: LintData): void {
+    const identifier = _getIdentifier_MemberExpression(node);
+    if (identifier) parse_Identifier(identifier, declaredVariables);
 }
 
 function _getIdentifier_MemberExpression(node: MemberExpression): Identifier | null {
@@ -174,7 +188,27 @@ function _finalize_LogicalExpression(node: LogicalExpression, result: any[]): an
 // ===== DECALRATIONS =====
 
 function parse_VariableDeclarator(node: VariableDeclaration, declaredVariables: LintData): void {
-    const name = (node.declarations[0].id as Identifier).name;
+    const declId = node.declarations[0].id;
+    if (declId.type === 'Identifier') {
+        _declareIdentifier(declId, declaredVariables)
+    } else if (declId.type === 'ObjectPattern') {
+        declId.properties.forEach(item => {
+            if (item.type === 'Property') {
+                if (item.key.type === 'Identifier') {
+                    _declareIdentifier(item.key, declaredVariables)
+                } else {
+                    console.error('Error 3, unexpected type');
+                }
+            } else {
+                console.error('Error 4, unexpected type');
+            }
+        })
+    }
+
+}
+
+function _declareIdentifier(node: Identifier, declaredVariables: LintData) {
+    const name = node.name;
     if (!declaredVariables.variables[name]) {
         declaredVariables.variables[name] = node;
         if (DEBUG_LOGGING) {
@@ -224,7 +258,6 @@ function checkReturn(declaredVariables: LintData, context: Rule.RuleContext, nod
         })
 
         return true;
-
     }
 
     return false
