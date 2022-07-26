@@ -1,4 +1,4 @@
-import rule from './rules/no-declaration-before-return/no-declaration-before-return';
+import rule from './no-declaration-before-return/no-declaration-before-return';
 
 export = {
   rules: {
