@@ -24,7 +24,13 @@ const unaryExpression = readFileSync(`${validDir}unary-expression.js`, 'utf-8');
 const unaryExpression2 = readFileSync(`${validDir}unary-expression-2.js`, 'utf-8');
 
 const binaryExpression = readFileSync(`${validDir}binary-expression.js`, 'utf-8');
+const conditionalExpression = readFileSync(`${validDir}conditional-expression.js`, 'utf-8');
+
 const complicatedDeclaration = readFileSync(`${validDir}complicated-declaration.js`, 'utf-8');
+const strangeDeclaration = readFileSync(`${validDir}strange-declaration.js`, 'utf-8');
+const renamedDeclaration = readFileSync(`${validDir}rename-declaration.js`, 'utf-8');
+
+// const fullFile = readFileSync(`${validDir}full-file.js`, 'utf-8');
 
 // Invalid
 const invalidFunction1 = readFileSync(`${__dirname}/test-data/invalid-function-1.js`, 'utf-8');
@@ -37,7 +43,11 @@ tester.run('no-declaration-before-return', rule, {
         { code: unaryExpression },
         { code: unaryExpression2 },
         { code: binaryExpression },
+        { code: conditionalExpression },
+
         { code: complicatedDeclaration },
+        { code: strangeDeclaration },
+        { code: renamedDeclaration },
     ],
     invalid: [
         { code: invalidFunction1, errors: [{ messageId: 'noDeclarationBeforeReturn' }] },

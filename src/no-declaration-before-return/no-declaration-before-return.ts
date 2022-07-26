@@ -1,8 +1,9 @@
 import { Rule } from "eslint";
 import { Node, BlockStatement, Expression, ExpressionStatement, FunctionDeclaration, Identifier, IfStatement, LogicalExpression, ReturnStatement, Statement, SwitchStatement, VariableDeclaration, FunctionExpression, ChainExpression, MemberExpression, UnaryExpression } from "estree";
+import { parse_VariableDeclaration } from "./parser/declarations";
 import { parse_AnyExpression } from "./parser/expressions";
 
-const DEBUG_LOGGING = 1;
+export const DEBUG_LOGGING = 0;
 
 export interface LintData { return: boolean, variables: Record<string, Node> };
 
@@ -46,7 +47,7 @@ function parse_BlockStatement(node: BlockStatement, declaredVariables: LintData,
 
         switch (element.type) {
             case "VariableDeclaration":
-                parse_VariableDeclarator(element, declaredVariables);
+                parse_VariableDeclaration(element, declaredVariables);
                 break;
             case "ExpressionStatement":
                 parse_ExpressionStatement(element, declaredVariables);
@@ -104,55 +105,13 @@ function parse_IfStatement(node: IfStatement, declaredVariables: LintData, conte
     }
 }
 
-
-
-// ===== DECLARATIONS =====
-
-function parse_VariableDeclarator(node: VariableDeclaration, declaredVariables: LintData): void {
-    // parsing declaration part
-    const declId = node.declarations[0].id;
-    if (declId.type === 'Identifier') {
-        _declareIdentifier(declId, declaredVariables)
-    } else if (declId.type === 'ObjectPattern') {
-        declId.properties.forEach(item => {
-            if (item.type === 'Property') {
-                if (item.key.type === 'Identifier') {
-                    _declareIdentifier(item.key, declaredVariables)
-                } else {
-                    console.error('Error 3, unexpected type');
-                }
-            } else {
-                console.error('Error 4, unexpected type');
-            }
-        })
-    }
-
-    // parsing init part
-    const initExpression = node.declarations[0].init;
-    if (initExpression) {
-        parse_AnyExpression(initExpression, declaredVariables);
-    }
-
-}
-
-function _declareIdentifier(node: Identifier, declaredVariables: LintData) {
-    const name = node.name;
-    if (!declaredVariables.variables[name]) {
-        declaredVariables.variables[name] = node;
-        if (DEBUG_LOGGING) {
-            console.log(`Added variable ${name} (${node.loc?.start.line} - ${node.loc?.end.line})`);
-        }
-    }
-}
-
 // ==== IDENTIFIERS =====
 
 export function parse_Identifier(node: Identifier, declaredVariables: LintData): void {
     if (declaredVariables.variables[node.name]) {
         delete declaredVariables.variables[node.name];
         if (DEBUG_LOGGING) {
-            console.log('removed:', node.name,
-                `${node.loc?.start?.column} -> ${node.loc?.end?.column}`);
+            console.log('removed:', node.name,);
         }
 
     }
