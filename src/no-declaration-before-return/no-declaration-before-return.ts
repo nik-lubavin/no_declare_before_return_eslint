@@ -62,7 +62,6 @@ function parse_BlockStatement(node: BlockStatement, declaredVariables: LintData,
             case "ReturnStatement":
 
                 parse_ReturnStatement(element, declaredVariables);
-
                 break;
         }
 
@@ -147,6 +146,7 @@ function checkReturn(declaredVariables: LintData, context: Rule.RuleContext, nod
         return true;
     }
 
+    declaredVariables.return = false;
     return false
 }
 

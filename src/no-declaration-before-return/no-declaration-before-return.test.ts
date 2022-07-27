@@ -30,7 +30,7 @@ const complicatedDeclaration = readFileSync(`${validDir}complicated-declaration.
 const strangeDeclaration = readFileSync(`${validDir}strange-declaration.js`, 'utf-8');
 const renamedDeclaration = readFileSync(`${validDir}rename-declaration.js`, 'utf-8');
 
-// const fullFile = readFileSync(`${validDir}full-file.js`, 'utf-8');
+const noReturn = readFileSync(`${validDir}no-return.js`, 'utf-8');
 
 // Invalid
 const invalidFunction1 = readFileSync(`${__dirname}/test-data/invalid-function-1.js`, 'utf-8');
@@ -38,19 +38,19 @@ const invalidFunction2 = readFileSync(`${__dirname}/test-data/invalid-function-2
 
 tester.run('no-declaration-before-return', rule, {
     valid: [
-        { code: validFunction },
-        { code: objectPattern },
-        { code: unaryExpression },
-        { code: unaryExpression2 },
-        { code: binaryExpression },
-        { code: conditionalExpression },
+        // { code: validFunction },
+        // { code: objectPattern },
+        // { code: unaryExpression },
+        // { code: unaryExpression2 },
+        // { code: binaryExpression },
+        // { code: conditionalExpression },
 
-        { code: complicatedDeclaration },
-        { code: strangeDeclaration },
-        { code: renamedDeclaration },
+        // { code: complicatedDeclaration },
+        { code: noReturn },
+        // { code: strangeDeclaration },
     ],
     invalid: [
-        { code: invalidFunction1, errors: [{ messageId: 'noDeclarationBeforeReturn' }] },
-        { code: invalidFunction2, errors: [{ messageId: 'noDeclarationBeforeReturn' }] },
+        // { code: invalidFunction1, errors: [{ messageId: 'noDeclarationBeforeReturn' }] },
+        // { code: invalidFunction2, errors: [{ messageId: 'noDeclarationBeforeReturn' }] },
     ]
 });
