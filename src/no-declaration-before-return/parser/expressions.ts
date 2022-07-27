@@ -1,7 +1,8 @@
 // ==== EXPRESSIONS ====
 
 import { ChainExpression, Expression, Identifier, LogicalExpression, MemberExpression, UnaryExpression } from "estree";
-import { identifierFilter, LintData, parse_ArrayOfIdentifiers, parse_Identifier } from "../no-declaration-before-return";
+import { LintData } from "../no-declaration-before-return";
+import { identifierFilter, parse_ArrayOfIdentifiers, parse_Identifier } from "./identifiers";
 import { extraLogging } from "./utils";
 
 export type IdentifierCandidates = any[];
@@ -52,14 +53,14 @@ function _parse_NonLogicalExpression(node: Expression, declaredVariables: LintDa
 
         parse_AnyExpression(node.callee as Expression, declaredVariables, doExtraLogging);
         node.arguments.forEach((arg) => {
-
             parse_AnyExpression(arg as Expression, declaredVariables, doExtraLogging);
         })
     } else if (node.type === 'ArrowFunctionExpression') {
         extraLogging(doExtraLogging, node);
         if (node.body.type === 'BlockStatement') {
             // Have not met still
-            console.error('Unimplemented');
+            // console.error('Unimplemented');
+            // parse_Blo
         } else {
             // is Expression
             parse_AnyExpression(node.body as Expression, declaredVariables, doExtraLogging);
@@ -76,6 +77,14 @@ function _parse_NonLogicalExpression(node: Expression, declaredVariables: LintDa
 
         node.elements.forEach(elementExpression =>
             parse_AnyExpression(elementExpression as Expression, declaredVariables, doExtraLogging))
+    } else if (node.type === 'ObjectExpression') {
+        extraLogging(doExtraLogging, node);
+
+        node.properties.forEach(property => {
+            if (property.type === "Property") {
+                parse_AnyExpression(property.value as Expression, declaredVariables, doExtraLogging)
+            }
+        });
 
     } else if (node.type === 'TemplateLiteral') {
         extraLogging(doExtraLogging, node);
@@ -106,33 +115,7 @@ function _finalize_UnaryExpression(node: UnaryExpression, declaredVariables: Lin
     } else {
         parse_AnyExpression(node.argument, declaredVariables);
     }
-
 }
-
-// function _finalize_ChainExpression(node: ChainExpression, declaredVariables: LintData) {
-//     if (node.expression.type === 'MemberExpression') {
-//         _finalize_MemberExpression(node.expression, declaredVariables);
-//     } else {
-//         console.error('Error 1, Unknown expression type');
-
-//     }
-// }
-
-// function _finalize_MemberExpression(node: MemberExpression, declaredVariables: LintData): void {
-//     const identifier = _getIdentifier_MemberExpression(node);
-//     if (identifier) parse_Identifier(identifier, declaredVariables);
-// }
-
-// function _getIdentifier_MemberExpression(node: MemberExpression): Identifier | null {
-//     // getting only the object in type Identifier
-//     if (node.object.type === 'MemberExpression') {
-//         return _getIdentifier_MemberExpression(node.object);
-//     } else if (node.object.type === 'Identifier') {
-//         return node.object;
-//     } else {
-//         return null;
-//     }
-// }
 
 function _parse_LogicalExpression(node: LogicalExpression, result: any[], doExtraLogging = false): any[] {
     if (node.left.type === 'LogicalExpression') {

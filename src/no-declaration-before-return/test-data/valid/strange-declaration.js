@@ -7,8 +7,6 @@ const data = {
       Const.sCarrierStatus.DELIVERY_REFUSED,
     ];
 
-    console.log()
-
     // figure out highest prio sCarrierStatusStandardised among packageIdentifierRows
     const piStatus = _.maxBy(
       this._cache?.packageIdentifierRows || [],
