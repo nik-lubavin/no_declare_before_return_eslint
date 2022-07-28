@@ -53,9 +53,9 @@ tester.run('no-declaration-before-return', noDeclarationBeforeReturn.default, {
 
     // { code: strangeDeclaration },
     // { code: switchStatement },
-    // { code: forOfStatement },
+    { code: forOfStatement },
     // { code: problem },
-    { code: throwExpression }
+    // { code: throwExpression }
   ],
   invalid: [
     // { code: invalidFunction1, errors: [{ messageId: 'noDeclarationBeforeReturn' }] },

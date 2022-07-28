@@ -1,36 +1,49 @@
 const data = {
     diff(rawO1, rawO2, opts) {
-        // FALSE-POSITIVE
-        const result = {};
-        let isDifferent = false;
-        let k;
+        for (const k of keys) {
+            let _diff;
+            const v1 = o1[k];
+            const v2 = o2[k];
 
-        let keys = _.uniq(_.concat(_.keys(o1), _.keys(o2)));
-        if (!isArray) {
-            keys = _.sortBy(keys);
-        }
-
-        for (k of keys) {
-            if (t1 !== t2) {
-                // types are different
-
-                if (opts.ignoreNullVsUndefined) {
-                    const t1ContainsNullUndef = [typeNull, typeUndefined].includes(t1);
-                    // ignore the case when one value is null and the other is undefined
-                    if (t1ContainsNullUndef && [typeNull, typeUndefined].includes(t2)) {
+            switch (t1) {
+                case typeArray:
+                case typeObject:
+                    if (_.isEqual(v1, v2)) {
                         continue;
                     }
-                }
 
-                isDifferent = true;
+                    isDifferent = true;
 
-                if (opts.keepRight) {
-                    result[k] = v2;
-                } else {
-                    result[k] = { l: v1, r: v2 };
-                }
+                    if (opts.keepRight) {
+                        result[k] = v2;
+                    } else if (opts.shallow) {
+                        result[k] = { l: v1, r: v2 };
+                    } else {
+                        _diff = self.diff(v1, v2, {
+                            ignoreNullVsUndefined: opts.ignoreNullVsUndefined,
+                            keepRight: false,
+                            shallow: false,
+                            name: k,
+                        });
+                        if (_diff !== undefined) {
+                            result[k] = _diff;
+                        }
+                    }
 
-                continue;
+                    continue;
+
+                default:
+                    // types are same ; values are different
+
+                    isDifferent = true;
+
+                    if (opts.keepRight) {
+                        result[k] = v2;
+                    } else {
+                        result[k] = { l: v1, r: v2 };
+                    }
+
+                    continue;
             }
         }
 
