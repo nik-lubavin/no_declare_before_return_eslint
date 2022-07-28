@@ -31,29 +31,32 @@ const switchStatement = fs.readFileSync(`${validDir}switch-statement.js`, 'utf-8
 const invalidFunction1 = fs.readFileSync(`${__dirname}/test-data/invalid-function-1.js`, 'utf-8');
 const invalidFunction2 = fs.readFileSync(`${__dirname}/test-data/invalid-function-2.js`, 'utf-8');
 
+const problem = fs.readFileSync(`${validDir}problem.js`, 'utf-8');
+
 Logger.init({ enable: true, startingLine: 16, endingLine: 36 });
 
 tester.run('no-declaration-before-return', noDeclarationBeforeReturn.default, {
   valid: [
-    // { code: validFunction },
-    // { code: objectPattern },
-    // { code: unaryExpression },
-    // { code: unaryExpression2 },
-    // { code: binaryExpression },
-    // { code: conditionalExpression },
-    // { code: complicatedDeclaration },
-    // { code: noReturn },
-    // { code: renamedDeclaration },
-    // { code: strangeCallExpression },
-    // { code: objectExpression },
-    // { code: arrayExpression },
+    { code: validFunction },
+    { code: objectPattern },
+    { code: unaryExpression },
+    { code: unaryExpression2 },
+    { code: binaryExpression },
+    { code: conditionalExpression },
+    { code: complicatedDeclaration },
+    { code: noReturn },
+    { code: renamedDeclaration },
+    { code: strangeCallExpression },
+    { code: objectExpression },
+    { code: arrayExpression },
 
-    // { code: strangeDeclaration },
-    // { code: forOfStatement },
+    { code: strangeDeclaration },
+    { code: forOfStatement },
     { code: switchStatement },
+    // { code: problem },
   ],
   invalid: [
-    // { code: invalidFunction1, errors: [{ messageId: 'noDeclarationBeforeReturn' }] },
-    // { code: invalidFunction2, errors: [{ messageId: 'noDeclarationBeforeReturn' }] },
+    { code: invalidFunction1, errors: [{ messageId: 'noDeclarationBeforeReturn' }] },
+    { code: invalidFunction2, errors: [{ messageId: 'noDeclarationBeforeReturn' }] },
   ],
 });
