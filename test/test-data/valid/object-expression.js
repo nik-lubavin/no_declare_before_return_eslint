@@ -21,7 +21,8 @@ const data = {
         const gpsFrequency = this.curr.oSettings?.mdCarr?.jSettings?.nGpsFrequency || 15;
 
         if (this.curr.jLastPosi?.dt
-            && (this.curr.jLastPosi.dt >= Ldt.now().plus({ minutes: gpsFrequency }).toISO())) {
+            && (this.curr.jLastPosi.dt >= Ldt.now()
+                .plus({ minutes: gpsFrequency }).toISO())) {
             return 'LIVE';
         }
     }

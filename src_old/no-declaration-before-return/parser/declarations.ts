@@ -3,7 +3,6 @@
 import { Identifier, VariableDeclaration } from "estree";
 import { DEBUG_LOGGING, LintData } from "../no-declaration-before-return";
 import { parse_AnyExpression } from "./expressions";
-import { extraLogging } from "./utils";
 
 export function parse_VariableDeclaration(node: VariableDeclaration, declaredVariables: LintData, doExtraLogging = false): void {
     // parsing declaration part

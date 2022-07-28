@@ -1,0 +1,11 @@
+# node_modules ignored by default
+# by creating this file
+
+# also all node_modules
+**/node_modules/
+
+src-old/
+
+**/test-data/*
+
+*.test.js

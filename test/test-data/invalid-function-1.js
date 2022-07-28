@@ -18,29 +18,23 @@ function invalid() {
 
     a11(a12)
     --a10
+    
 
-    a9 = a8
-
-    // Ternarny
-
+    const { a14 } = func();
+    const [a15] = func();
+    
 
     if ((2 > a1) || (a2 > a1) || calcB(a3) || a4()) {
-        a5 += 1
-        ++a8
-        a9++
-        superfunc(a6, a7)
+        a5 += 1;
+        ++a8;
+        a9++;
+        superfunc(a6, a7);
+        a13();
+        a14();
         return;
     } else if (a10 > 2) {
         console.log(a);
     }
-
-    // switch (b) {
-    //     case 1:
-    //         return 1
-
-    //     case 2:
-    //         return 2
-    // }
 
     console.log(a);
 }

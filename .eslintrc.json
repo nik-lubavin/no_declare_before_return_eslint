@@ -1,0 +1,265 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": [
+    "prettier",
+    "plugin:jsdoc/recommended",
+    "plugin:sonarjs/recommended",
+    "airbnb-base",
+    "plugin:chai-friendly/recommended"
+  ],
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "ecmaVersion": 2021
+  },
+  "plugins": [
+    "sonarjs",
+    "chai-friendly",
+    "jsdoc",
+    "regex"
+  ],
+  "rules": {
+    "class-methods-use-this": [
+      "error",
+      {
+        "exceptMethods": [
+          "getChildClasses",
+          "insertDefaults",
+          "updateDefaults",
+          "deleteDefaults",
+          "sqlNotDeleted",
+          "isDeleted",
+          "isReadOnly"
+        ]
+      }
+    ],
+    "jsdoc/require-throws": "warn",
+    "jsdoc/require-jsdoc": "off",
+    "import/no-dynamic-require": "off",
+    "global-require": "off",
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        "packageDir": ".",
+        "devDependencies": [
+          "test/**",
+          "tests/**",
+          "spec/**",
+          "**/__tests__/**",
+          "**/__mocks__/**",
+          "test.{js,jsx}",
+          "test-*.{js,jsx}",
+          "**/*{.,_}{test,spec}.{js,jsx}",
+          "**/jest.config.js",
+          "**/jest.setup.js",
+          "**/vue.config.js",
+          "**/webpack.config.js",
+          "**/webpack.config.*.js",
+          "**/rollup.config.js",
+          "**/rollup.config.*.js",
+          "**/gulpfile.js",
+          "**/gulpfile.*.js",
+          "**/Gruntfile{,.js}",
+          "**/protractor.conf.js",
+          "**/protractor.conf.*.js",
+          "**/karma.conf.js",
+          "**/.eslintrc.js"
+        ],
+        "optionalDependencies": false
+      }
+    ],
+    "no-underscore-dangle": "off",
+    "no-continue": "off",
+    "import/extensions": [
+      "error",
+      "never"
+    ],
+    "no-console": "off",
+    "max-len": [
+      "error",
+      100,
+      2,
+      {
+        "ignoreUrls": true,
+        "ignoreComments": true,
+        "ignoreRegExpLiterals": true,
+        "ignoreStrings": true,
+        "ignoreTemplateLiterals": true
+      }
+    ],
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "ForInStatement",
+        "message": "for..in loops iterate over the entire prototype chain, which is virtually never what you want. Use Object.{keys,values,entries}, and iterate over the resulting array."
+      },
+      {
+        "selector": "LabeledStatement",
+        "message": "Labels are a form of GOTO; using them makes code confusing and hard to maintain and understand."
+      },
+      {
+        "selector": "WithStatement",
+        "message": "`with` is disallowed in strict mode because it makes code impossible to predict and optimize."
+      }
+    ],
+    "no-param-reassign": [
+      "error",
+      {
+        "props": false
+      }
+    ],
+    "jsdoc/valid-types": "off",
+    "regex/invalid": [
+      "error",
+      [
+        {
+          "regex": "return\\s(msg|expect|itSync|t\\.test|tap\\.test)\\(",
+          "message": "No need to return some things when making a test."
+        },
+        {
+          "regex": "Object\\(\\s*\\{",
+          "message": "Just use the regular { } construction"
+        },
+        {
+          "regex": "[^a-zA-Z0-9]Array\\(",
+          "message": "Just use the regular [ ] construction"
+        },
+        {
+          "regex": "Array\\.from",
+          "message": "No Array.from for you sir! Please carefully remove it."
+        },
+        {
+          "regex": "\\.substr\\([^,())]+\\)",
+          "message": "substr is soft-deprecated as its not in the standard and actually a browser function. Use substring instead."
+        },
+        {
+          "regex": "(ESLint feedback)|(decaffeinate suggestions)",
+          "message": "Don't leave coffeescript conversion hints lingering in the source"
+        }
+      ]
+    ]
+  },
+  "globals": {
+    "mocha": "readonly",
+    "Mocha": "readonly",
+    "describe": "readonly",
+    "before": "readonly",
+    "beforeEach": "readonly",
+    "after": "readonly",
+    "afterEach": "readonly",
+    "it": "readonly",
+    "run": "readonly",
+    "t": "readonly",
+    "chai": "readonly",
+    "assert": "readonly",
+    "expect": "readonly",
+    "sinon": "readonly",
+    "e2e": "readonly",
+    "msg": "readonly",
+    "console": "readonly",
+    "clearInterval": "readonly",
+    "clearTimeout": "readonly",
+    "setInterval": "readonly",
+    "setTimeout": "readonly",
+    "Set": "readonly",
+    "__dirname": "readonly",
+    "__filename": "readonly",
+    "Buffer": "readonly",
+    "exports": "readonly",
+    "global": "readonly",
+    "module": "readonly",
+    "process": "readonly",
+    "require": "readonly",
+    "_": "readonly",
+    "sync": "readonly",
+    "log": "readonly",
+    "circDep": "readonly",
+    "Config": "readonly",
+    "Const": "readonly",
+    "Ctx": "readonly",
+    "Root": "readonly",
+    "E": "readonly",
+    "moment": "readonly",
+    "Ext": "readonly",
+    "unescape": "readonly",
+    "SVG": "readonly",
+    "svgPanZoom": "readonly",
+    "dtz": "readonly",
+    "Ldt": "readonly",
+    "utils": "readonly",
+    "postRobot": "readonly",
+    "L": "readonly",
+    "jquery": "readonly",
+    "$": "readonly",
+    "Qty": "readonly",
+    "_uiq": "readonly",
+    "objectHash": "readonly",
+    "html2canvas": "readonly",
+    "tzlookup": "readonly",
+    "Intercom": "readonly",
+    "intercomSettings": "readonly",
+    "aptrinsic": "readonly",
+    "debug": "readonly",
+    "umsClient": "readonly",
+    "trx": "readonly",
+    "argo": "readonly",
+    "argus": "readonly",
+    "ExtAs": "readonly",
+    "Slick": "readonly",
+    "esc": "readonly",
+    "app": "readonly",
+    "App": "readonly",
+    "APP": "readonly",
+    "Sch": "readonly",
+    "getUserStorage": "readonly",
+    "setUserStorage": "readonly",
+    "loadUserStorage": "readonly",
+    "userStorage": "readonly",
+    "Base64": "readonly",
+    "$window": "readonly",
+    "CT": "readonly",
+    "Ct": "readonly",
+    "Portal": "readonly",
+    "CtMap": "readonly",
+    "milestone": "readonly",
+    "SupplyStack": "readonly",
+    "Languages": "readonly",
+    "Units": "readonly",
+    "shared": "readonly",
+    "validator": "readonly",
+    "pgsql": "readonly",
+    "pgsqlRepl": "readonly",
+    "redis": "readonly",
+    "framework": "readonly",
+    "afterSync": "readonly",
+    "beforeSync": "readonly",
+    "itSync": "readonly"
+  },
+  "settings": {
+    "import/extensions": [
+      ".js",
+      ".coffee"
+    ],
+    "import/resolver": {
+      "alias": {
+        "map": [
+          [
+            "@",
+            "."
+          ],
+          [
+            "$root",
+            "."
+          ]
+        ],
+        "extensions": [
+          ".js",
+          ".coffee"
+        ]
+      }
+    }
+  }
+}
