@@ -3,6 +3,7 @@ const data = {
         // FALSE-POSITIVE
         const result = {};
         let isDifferent = false;
+        const isNotDifferent = true;
         let k;
 
         let keys = _.uniq(_.concat(_.keys(o1), _.keys(o2)));
@@ -10,14 +11,16 @@ const data = {
             keys = _.sortBy(keys);
         }
 
-        switch (t1) {
+        const typeArray = 1;
+
+        switch (t1()) {
             case typeArray:
             case typeObject:
                 if (_.isEqual(v1, v2)) {
-                    v1=v2
+                    v1 = v2
                 }
 
-                isDifferent = true;
+                isDifferent = isNotDifferent;
 
                 if (opts.keepRight) {
                     result[k] = v2;
@@ -35,7 +38,7 @@ const data = {
                     }
                 }
 
-                v1=v2
+                v1 = v2
 
             default:
                 // types are same ; values are different
@@ -48,7 +51,7 @@ const data = {
                     result[k] = { l: v1, r: v2 };
                 }
 
-                v1=v2
+                v1 = v2
         }
 
         if (!isDifferent) {
@@ -63,4 +66,3 @@ const data = {
         return undefined;
     },
 }
-
