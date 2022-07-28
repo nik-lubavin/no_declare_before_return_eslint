@@ -51,8 +51,8 @@ tester.run('no-declaration-before-return', noDeclarationBeforeReturn.default, {
     { code: arrayExpression },
 
     { code: strangeDeclaration },
-    { code: forOfStatement },
     { code: switchStatement },
+    { code: forOfStatement },
     // { code: problem },
   ],
   invalid: [
