@@ -27,36 +27,38 @@ const objectExpression = fs.readFileSync(`${validDir}object-expression.js`, 'utf
 const arrayExpression = fs.readFileSync(`${validDir}array-expression.js`, 'utf-8');
 const forOfStatement = fs.readFileSync(`${validDir}for-of-statement.js`, 'utf-8');
 const switchStatement = fs.readFileSync(`${validDir}switch-statement.js`, 'utf-8');
+const throwExpression = fs.readFileSync(`${validDir}throw-expression.js`, 'utf-8');
 // Invalid
 const invalidFunction1 = fs.readFileSync(`${__dirname}/test-data/invalid-function-1.js`, 'utf-8');
 const invalidFunction2 = fs.readFileSync(`${__dirname}/test-data/invalid-function-2.js`, 'utf-8');
 
 const problem = fs.readFileSync(`${validDir}problem.js`, 'utf-8');
 
-Logger.init({ enable: true, startingLine: 16, endingLine: 36 });
+Logger.init({ enable: true });
 
 tester.run('no-declaration-before-return', noDeclarationBeforeReturn.default, {
   valid: [
-    { code: validFunction },
-    { code: objectPattern },
-    { code: unaryExpression },
-    { code: unaryExpression2 },
-    { code: binaryExpression },
-    { code: conditionalExpression },
-    { code: complicatedDeclaration },
-    { code: noReturn },
-    { code: renamedDeclaration },
-    { code: strangeCallExpression },
-    { code: objectExpression },
-    { code: arrayExpression },
+    // { code: validFunction },
+    // { code: objectPattern },
+    // { code: unaryExpression },
+    // { code: unaryExpression2 },
+    // { code: binaryExpression },
+    // { code: conditionalExpression },
+    // { code: complicatedDeclaration },
+    // { code: noReturn },
+    // { code: renamedDeclaration },
+    // { code: strangeCallExpression },
+    // { code: objectExpression },
+    // { code: arrayExpression },
 
-    { code: strangeDeclaration },
-    { code: switchStatement },
-    { code: forOfStatement },
+    // { code: strangeDeclaration },
+    // { code: switchStatement },
+    // { code: forOfStatement },
     // { code: problem },
+    { code: throwExpression }
   ],
   invalid: [
-    { code: invalidFunction1, errors: [{ messageId: 'noDeclarationBeforeReturn' }] },
-    { code: invalidFunction2, errors: [{ messageId: 'noDeclarationBeforeReturn' }] },
+    // { code: invalidFunction1, errors: [{ messageId: 'noDeclarationBeforeReturn' }] },
+    // { code: invalidFunction2, errors: [{ messageId: 'noDeclarationBeforeReturn' }] },
   ],
 });
