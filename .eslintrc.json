@@ -11,9 +11,9 @@
     "airbnb-base",
     "plugin:chai-friendly/recommended"
   ],
-  "parser": "babel-eslint",
+  "parser": "espree",
   "parserOptions": {
-    "ecmaVersion": 2021
+    "ecmaVersion": 2020
   },
   "plugins": [
     "sonarjs",

@@ -4,15 +4,10 @@
   "description": "Do not declare vars before return",
   "main": "lib/index.js",
   "scripts": {
-    "start-tutorial": "rimraf \"src/rules/**/*\" && rimraf src/index.ts && npm un @typescript-eslint/parser",
-    "clean": "rimraf lib",
-    "prebuild": "rimraf node_modules/@types/eslint/node_modules/@types/estree",
-    "build": "tsc",
     "prettier": "prettier \"*.{js,json,yml,yaml,md}\" \"src/**/*\" \"guide/**/*\"",
     "format": "yarn prettier --write",
     "format:check": "yarn prettier --check",
-    "test": "jest",
-    "prepublish": "npm run clean && npm run build"
+    "test": "jest"
   },
   "files": [
     "README.md",
@@ -30,7 +25,6 @@
     "@types/eslint": "8.4.2",
     "@types/estree": "0.0.51",
     "@types/node": "16.11.41",
-    "@typescript-eslint/parser": "5.26.0",
     "babel-eslint": "^10.1.0",
     "eslint": "8.17.0",
     "eslint-config-airbnb": "^19.0.4",
@@ -47,8 +41,7 @@
     "prettier-airbnb-config": "^1.0.0",
     "pretty-quick": "3.1.3",
     "rimraf": "3.0.2",
-    "ts-jest": "28.0.6",
-    "typescript": "4.7.3"
+    "ts-jest": "28.0.6"
   },
   "peerDependencies": {
     "eslint": "^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0"
