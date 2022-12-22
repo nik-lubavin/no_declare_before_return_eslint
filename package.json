@@ -7,7 +7,7 @@
     "prettier": "prettier \"*.{js,json,yml,yaml,md}\" \"src/**/*\" \"guide/**/*\"",
     "format": "yarn prettier --write",
     "format:check": "yarn prettier --check",
-    "test": "jest"
+    "test": "ESLINT_LOGGING=true jest"
   },
   "files": [
     "README.md",

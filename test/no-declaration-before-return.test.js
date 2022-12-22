@@ -39,33 +39,34 @@ const complicatedIfInvalid = fs.readFileSync(`${invalidDir}complicated-if-invali
 
 const problem = fs.readFileSync(`${validDir}problem.js`, 'utf-8');
 
-Logger.init({ enable: true });
+const enable = process.env.ESLINT_LOGGING || false;
+Logger.init({ enable });
 
 tester.run('no-declaration-before-return', noDeclarationBeforeReturn.default, {
   valid: [
-    // { code: validFunction },
-    // { code: objectPattern },
-    // { code: unaryExpression },
-    // { code: unaryExpression2 },
-    // { code: binaryExpression },
-    // { code: conditionalExpression },
-    // { code: complicatedDeclaration },
-    // { code: noReturn },
-    // { code: renamedDeclaration },
-    // { code: strangeCallExpression },
-    // { code: objectExpression },
-    // { code: arrayExpression },
+    { code: validFunction },
+    { code: objectPattern },
+    { code: unaryExpression },
+    { code: unaryExpression2 },
+    { code: binaryExpression },
+    { code: conditionalExpression },
+    { code: complicatedDeclaration },
+    { code: noReturn },
+    { code: renamedDeclaration },
+    { code: strangeCallExpression },
+    { code: objectExpression },
+    { code: arrayExpression },
 
-    // { code: strangeDeclaration },
-    // { code: switchStatement },
+    { code: strangeDeclaration },
+    { code: switchStatement },
     // { code: problem },
-    // { code: throwExpression }
+    { code: throwExpression },
     { code: complicatedSwitch },
-    // { code: complicatedIf },
+    { code: complicatedIf },
   ],
   invalid: [
-    // { code: invalidFunction1, errors: [{ messageId: 'noDeclarationBeforeReturn' }] },
-    // { code: invalidFunction2, errors: [{ messageId: 'noDeclarationBeforeReturn' }] },
-    // { code: complicatedIfInvalid, errors: [{ messageId: 'noDeclarationBeforeReturn' }] },
+    { code: invalidFunction1, errors: [{ messageId: 'noDeclarationBeforeReturn' }] },
+    { code: invalidFunction2, errors: [{ messageId: 'noDeclarationBeforeReturn' }] },
+    { code: complicatedIfInvalid, errors: [{ messageId: 'noDeclarationBeforeReturn' }] },
   ],
 });
