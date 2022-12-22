@@ -28,9 +28,14 @@ const arrayExpression = fs.readFileSync(`${validDir}array-expression.js`, 'utf-8
 const forOfStatement = fs.readFileSync(`${validDir}for-of-statement.js`, 'utf-8');
 const switchStatement = fs.readFileSync(`${validDir}switch-statement.js`, 'utf-8');
 const throwExpression = fs.readFileSync(`${validDir}throw-expression.js`, 'utf-8');
+
+const complicatedSwitch = fs.readFileSync(`${validDir}complicated-switch.js`, 'utf-8');
+const complicatedIf = fs.readFileSync(`${validDir}complicated-if.js`, 'utf-8');
 // Invalid
-const invalidFunction1 = fs.readFileSync(`${__dirname}/test-data/invalid-function-1.js`, 'utf-8');
-const invalidFunction2 = fs.readFileSync(`${__dirname}/test-data/invalid-function-2.js`, 'utf-8');
+const invalidDir = `${__dirname}/test-data/invalid/`;
+const invalidFunction1 = fs.readFileSync(`${invalidDir}invalid-function-1.js`, 'utf-8');
+const invalidFunction2 = fs.readFileSync(`${invalidDir}invalid-function-2.js`, 'utf-8');
+const complicatedIfInvalid = fs.readFileSync(`${invalidDir}complicated-if-invalid.js`, 'utf-8');
 
 const problem = fs.readFileSync(`${validDir}problem.js`, 'utf-8');
 
@@ -53,12 +58,14 @@ tester.run('no-declaration-before-return', noDeclarationBeforeReturn.default, {
 
     // { code: strangeDeclaration },
     // { code: switchStatement },
-    { code: forOfStatement },
     // { code: problem },
     // { code: throwExpression }
+    { code: complicatedSwitch },
+    // { code: complicatedIf },
   ],
   invalid: [
     // { code: invalidFunction1, errors: [{ messageId: 'noDeclarationBeforeReturn' }] },
     // { code: invalidFunction2, errors: [{ messageId: 'noDeclarationBeforeReturn' }] },
+    // { code: complicatedIfInvalid, errors: [{ messageId: 'noDeclarationBeforeReturn' }] },
   ],
 });
