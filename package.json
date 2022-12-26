@@ -7,7 +7,8 @@
     "prettier": "prettier \"*.{js,json,yml,yaml,md}\" \"src/**/*\" \"guide/**/*\"",
     "format": "yarn prettier --write",
     "format:check": "yarn prettier --check",
-    "test": "ESLINT_LOGGING=true jest"
+    "test": "ESLINT_LOGGING=true jest",
+    "test:debug": "ESLINT_LOGGING=true node --inspect-brk node_modules/.bin/jest --runInBand"
   },
   "files": [
     "README.md",

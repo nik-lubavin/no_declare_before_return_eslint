@@ -33,6 +33,7 @@ const complicatedSwitch = fs.readFileSync(`${validDir}complicated-switch.js`, 'u
 const complicatedIf = fs.readFileSync(`${validDir}complicated-if.js`, 'utf-8');
 const tryCatchComlicated = fs.readFileSync(`${validDir}try-catch-complicated.js`, 'utf-8');
 const strange1 = fs.readFileSync(`${validDir}strange1.js`, 'utf-8');
+const arrowFunction = fs.readFileSync(`${validDir}arrow-function.js`, 'utf-8');
 
 // Invalid
 const invalidDir = `${__dirname}/test-data/invalid/`;
@@ -68,7 +69,7 @@ tester.run('no-declaration-before-return', noDeclarationBeforeReturn.default, {
     // { code: complicatedIf },
 
     // { code: strange1 },
-    { code: tryCatchComlicated },
+    { code: arrowFunction },
   ],
   invalid: [
     // { code: invalidFunction1, errors: [{ messageId: 'noDeclarationBeforeReturn' }] },
