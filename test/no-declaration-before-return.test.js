@@ -35,6 +35,8 @@ const tryCatchComlicated = fs.readFileSync(`${validDir}try-catch-complicated.js`
 const strange1 = fs.readFileSync(`${validDir}strange1.js`, 'utf-8');
 const arrowFunction = fs.readFileSync(`${validDir}arrow-function.js`, 'utf-8');
 
+const newF = fs.readFileSync(`${validDir}new.js`, 'utf-8');
+
 // Invalid
 const invalidDir = `${__dirname}/test-data/invalid/`;
 const invalidFunction1 = fs.readFileSync(`${invalidDir}invalid-function-1.js`, 'utf-8');
@@ -69,7 +71,7 @@ tester.run('no-declaration-before-return', noDeclarationBeforeReturn.default, {
     // { code: complicatedIf },
 
     // { code: strange1 },
-    { code: arrowFunction },
+    { code: newF },
   ],
   invalid: [
     // { code: invalidFunction1, errors: [{ messageId: 'noDeclarationBeforeReturn' }] },
