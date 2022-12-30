@@ -1,4 +1,4 @@
-function f1() {
+function f1(arg1, arg2, arg3) {
     // stop updates
     const iterable = data.aStops || [];
     for (let i = 0; i < iterable.length; i += 1) {
