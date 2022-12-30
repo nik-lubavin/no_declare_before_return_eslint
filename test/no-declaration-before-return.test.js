@@ -36,6 +36,7 @@ const strange1 = fs.readFileSync(`${validDir}strange1.js`, 'utf-8');
 const arrowFunction = fs.readFileSync(`${validDir}arrow-function.js`, 'utf-8');
 
 const forStatement = fs.readFileSync(`${validDir}for-statement.js`, 'utf-8');
+const arrowFunctionCall = fs.readFileSync(`${validDir}arrow-function-call-return.js`, 'utf-8');
 
 // Invalid
 const invalidDir = `${__dirname}/test-data/invalid/`;
@@ -71,7 +72,8 @@ tester.run('no-declaration-before-return', noDeclarationBeforeReturn.default, {
     // { code: complicatedIf },
 
     // { code: strange1 },
-    { code: forStatement },
+    // { code: forStatement },
+    { code: arrowFunctionCall },
   ],
   invalid: [
     // { code: invalidFunction1, errors: [{ messageId: 'noDeclarationBeforeReturn' }] },
